@@ -38,6 +38,17 @@ public class Pricingday {
 
     }
     
+    public func get_index() async throws -> Any {
+        guard let url = URL(string: "\(api)/index.json") else {
+            throw NSError(domain: "Invalid URL", code: -1)
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = headers
+        let (data, _) = try await URLSession.shared.data(for: request)
+        return  try JSONSerialization.jsonObject(with: data)
+    }
+    
     public func get_catalog() async throws -> Any {
         guard let url = URL(string: "\(api)/catalog.json") else {
             throw NSError(domain: "Invalid URL", code: -1)
