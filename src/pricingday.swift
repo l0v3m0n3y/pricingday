@@ -22,7 +22,7 @@ extension URLSession {
 
 
 public class Pricingday {
-    private let api = "https://pricing.day/_next/data/ltZLXFvzTh1RillBuqeGx"
+    private let api = "https://pricing.day/_next/data"
     private let api_2 = "https://pricing.day/api/v01"
     private var headers: [String: String]
     
@@ -37,70 +37,47 @@ public class Pricingday {
         ]
 
     }
-    
-    public func get_index() async throws -> Any {
-        guard let url = URL(string: "\(api)/index.json") else {
+
+    private func fetchJSON(from urlString: String,method: HTTPMethod = .get,body: Data? = nil,queryParameters: [String: String]? = nil) async throws -> Any {
+        var urlComponents = URLComponents(string: urlString)
+        if let queryParameters = queryParameters {
+            urlComponents?.queryItems = queryParameters.map { URLQueryItem(name: $0.key, value: $0.value) }
+        }
+        guard let url = urlComponents?.url else {
             throw NSError(domain: "Invalid URL", code: -1)
         }
         var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        request.httpMethod = method.rawValue
         request.allHTTPHeaderFields = headers
+        if let body = body {
+            request.httpBody = body
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        }
         let (data, _) = try await URLSession.shared.data(for: request)
-        return  try JSONSerialization.jsonObject(with: data)
+        return try JSONSerialization.jsonObject(with: data)
     }
     
-    public func get_catalog() async throws -> Any {
-        guard let url = URL(string: "\(api)/catalog.json") else {
-            throw NSError(domain: "Invalid URL", code: -1)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return  try JSONSerialization.jsonObject(with: data)
+    public func getIndex(bildId: String = "ltZLXFvzTh1RillBuqeGx") async throws -> Any {
+        return try await fetchJSON(from: "\(api)/\(bildId)/index.json")
     }
     
-    public func get_from_catalog(id: Int) async throws -> Any {
-        guard let url = URL(string: "\(api)/catalog/\(id).json") else {
-            throw NSError(domain: "Invalid URL", code: -1)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return  try JSONSerialization.jsonObject(with: data)
+    public func getCatalog(bildId: String = "ltZLXFvzTh1RillBuqeGx") async throws -> Any {
+        return try await fetchJSON(from: "\(api)/\(bildId)/catalog.json")
     }
     
-    public func get_products_by_id(id: Int) async throws -> Any {
-        guard let url = URL(string: "\(api)/products/\(id).json") else {
-            throw NSError(domain: "Invalid URL", code: -1)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return  try JSONSerialization.jsonObject(with: data)
+    public func getFromCatalog(bildId: String = "ltZLXFvzTh1RillBuqeGx",id: Int) async throws -> Any {
+        return try await fetchJSON(from: "\(api)/\(bildId)/catalog/\(id).json")
     }
     
-    public func get_product_details(id: Int) async throws -> Any {
-        guard let url = URL(string: "\(api_2)/product/details/\(id)") else {
-            throw NSError(domain: "Invalid URL", code: -1)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return  try JSONSerialization.jsonObject(with: data)
+    public func getProductsById(bildId: String = "ltZLXFvzTh1RillBuqeGx",id: Int) async throws -> Any {
+        return try await fetchJSON(from: "\(api)/\(bildId)/products/\(id).json")
     }
     
-    public func get_news_by_id(id: Int) async throws -> Any {
-        guard let url = URL(string: "\(api)/news/\(id).json") else {
-            throw NSError(domain: "Invalid URL", code: -1)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return  try JSONSerialization.jsonObject(with: data)
+    public func getProductDetails(id: Int) async throws -> Any {
+        return try await fetchJSON(from: "\(api_2)/product/details/\(id)")
+    }
+    
+    public func getNewsById(bildId: String = "ltZLXFvzTh1RillBuqeGx",id: Int) async throws -> Any {
+        return try await fetchJSON(from: "\(api)/\(bildId)/news/\(id).json")
     }
 }
