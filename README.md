@@ -6,7 +6,7 @@ import Foundation
 let client = Pricingday()
 
 do {
-    let catalog = try await client.get_catalog()
+    let catalog = try await client.getCatalog()
     print(catalog)
 } catch {
     print("Error: \(error)")
@@ -16,6 +16,5 @@ do {
 
 # Launch (your script)
 ```
-swiftc -o pricingday pricingday.swift main.swift
-./pricingday
+swift run
 ```
