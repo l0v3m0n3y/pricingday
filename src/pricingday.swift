@@ -20,6 +20,13 @@ extension URLSession {
     }
 }
 
+public enum HTTPMethod: String {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
+    case patch = "PATCH"
+}
 
 public class Pricingday {
     private let api = "https://pricing.day/_next/data"
